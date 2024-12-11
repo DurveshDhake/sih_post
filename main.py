@@ -15,9 +15,10 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Check and download model files if missing
 model_files = ['Tfidf.pkl', 'model.pkl']
 model_urls = {
-    'Tfidf.pkl': 'https://example.com/path-to-your-tfidf-pickle-file',
-    'model.pkl': 'https://example.com/path-to-your-model-pickle-file'
+    'Tfidf.pkl': 'https://example.com/path-to-tfidf.pkl',
+    'model.pkl': 'https://example.com/path-to-model.pkl'
 }
+
 
 for file in model_files:
     file_path = os.path.join(BASE_DIR, file)
