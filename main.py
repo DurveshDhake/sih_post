@@ -1,32 +1,21 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import pickle
-import os  # Import missing os module
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import StandardScaler
+import os
 
 # Initialize FastAPI app
 app = FastAPI()
-
-# Fix the issue with BASE_DIR by using the correct name for the file
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # Use __file__ instead of _file_
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Load the saved models (TF-IDF Vectorizer and Logistic Regression Model)
-try:
-    with open(os.path.join(BASE_DIR, 'Tfidf.pkl'), 'rb') as f:
-        tfidf_vectorizer = pickle.load(f)
+with open(os.path.join(BASE_DIR, 'Tfidf.pkl'), 'rb') as f:
+    tfidf_vectorizer = pickle.load(f)
 
-    with open(os.path.join(BASE_DIR, 'model.pkl'), 'rb') as f:
-        prediction_model = pickle.load(f)
-except Exception as e:
-    raise HTTPException(status_code=500, detail=f"Error loading models: {str(e)}")
-
-# Define a simple route for checking if the server is up
-@app.get("/")
-def read_root():
-    return {"message": "Hello, World!"}
+with open(os.path.join(BASE_DIR, 'model.pkl'), 'rb') as f:
+    prediction_model = pickle.load(f)
 
 # Define the input data structure
 class AnalyzePostRequest(BaseModel):
@@ -51,9 +40,9 @@ async def analyze_post(request: AnalyzePostRequest):
         # Prepare the combined feature for prediction (TF-IDF features + '5_label_majority_answer')
         X_combined = pd.DataFrame(tfidf_features.toarray())
 
-        # Add the label_probability to the features dataframe
+        # Add '5_label_majority_answer' to the features
         X_combined['5_label_majority_answer'] = label_probability
-        X_combined.columns = X_combined.columns.astype(str)  # Ensure columns are strings
+        X_combined.columns = X_combined.columns.astype(str)
 
         # Make the prediction using the loaded prediction model
         prediction = prediction_model.predict(X_combined)
@@ -61,5 +50,12 @@ async def analyze_post(request: AnalyzePostRequest):
         # Return the prediction as a JSON response
         return {"prediction": int(prediction[0]), "label_probability": label_probability}
 
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Error in prediction: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error processing request: {e}")
+
+# Root endpoint for basic health check
+@app.get("/")
+def root():
+    return {"message": "TF-IDF Vectorizer and Prediction Model are ready to process text."}
