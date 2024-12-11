@@ -5,20 +5,35 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 import os
+import sys
+import requests
 
 # Initialize FastAPI app
 app = FastAPI()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-tfidf_path = os.path.join(BASE_DIR, 'Tfidf.pkl')
-model_path = os.path.join(BASE_DIR, 'model.pkl')
+# Check and download model files if missing
+model_files = ['Tfidf.pkl', 'model.pkl']
+model_urls = {
+    'Tfidf.pkl': '<URL_TO_TFIDF_PICKLE>',
+    'model.pkl': '<URL_TO_MODEL_PICKLE>'
+}
 
-if not os.path.exists(tfidf_path) or not os.path.exists(model_path):
-    raise FileNotFoundError("Model files are missing in the deployment environment.")
+for file in model_files:
+    file_path = os.path.join(BASE_DIR, file)
+    if not os.path.exists(file_path):
+        if file in model_urls:
+            print(f"Downloading {file}...")
+            with open(file_path, 'wb') as f:
+                f.write(requests.get(model_urls[file]).content)
+        else:
+            sys.exit(f"Error: {file} is missing and no URL is provided.")
 
-with open(tfidf_path, 'rb') as f:
+# Load the saved models (TF-IDF Vectorizer and Logistic Regression Model)
+with open(os.path.join(BASE_DIR, 'Tfidf.pkl'), 'rb') as f:
     tfidf_vectorizer = pickle.load(f)
-with open(model_path, 'rb') as f:
+
+with open(os.path.join(BASE_DIR, 'model.pkl'), 'rb') as f:
     prediction_model = pickle.load(f)
 
 # Define the input data structure
