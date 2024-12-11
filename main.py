@@ -23,18 +23,28 @@ for file in model_files:
     file_path = os.path.join(BASE_DIR, file)
     if not os.path.exists(file_path):
         if file in model_urls:
-            print(f"Downloading {file}...")
-            with open(file_path, 'wb') as f:
-                f.write(requests.get(model_urls[file]).content)
+            try:
+                print(f"Downloading {file}...")
+                response = requests.get(model_urls[file])
+                response.raise_for_status()
+                with open(file_path, 'wb') as f:
+                    f.write(response.content)
+            except requests.exceptions.RequestException as e:
+                sys.exit(f"Error downloading {file}: {e}")
         else:
             sys.exit(f"Error: {file} is missing and no URL is provided.")
 
 # Load the saved models (TF-IDF Vectorizer and Logistic Regression Model)
-with open(os.path.join(BASE_DIR, 'Tfidf.pkl'), 'rb') as f:
-    tfidf_vectorizer = pickle.load(f)
+try:
+    with open(os.path.join(BASE_DIR, 'Tfidf.pkl'), 'rb') as f:
+        tfidf_vectorizer = pickle.load(f)
 
-with open(os.path.join(BASE_DIR, 'model.pkl'), 'rb') as f:
-    prediction_model = pickle.load(f)
+    with open(os.path.join(BASE_DIR, 'model.pkl'), 'rb') as f:
+        prediction_model = pickle.load(f)
+except FileNotFoundError as e:
+    sys.exit(f"Error loading model files: {e}")
+except Exception as e:
+    sys.exit(f"Unexpected error loading model files: {e}")
 
 # Define the input data structure
 class AnalyzePostRequest(BaseModel):
