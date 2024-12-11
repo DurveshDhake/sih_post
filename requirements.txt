@@ -5,3 +5,4 @@ pydantic
 numpy
 pickle-mixin
 pandas
+requests
