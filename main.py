@@ -10,6 +10,10 @@ from sklearn.preprocessing import StandardScaler
 # Initialize FastAPI app
 app = FastAPI()
 
+@app.get("/")
+def read_root():
+    return {"message": "Hello, World!"}
+
 # Load the saved models (TF-IDF Vectorizer and Logistic Regression Model)
 with open('Tfidf.pkl', 'rb') as f:
     tfidf_vectorizer = pickle.load(f)
