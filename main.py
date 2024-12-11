@@ -13,9 +13,9 @@ app = FastAPI()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Check and download model files if missing
-model_files = ['Tfidf.pkl', 'model.pkl']
+model_files = ['tfidf.pkl', 'model.pkl']
 model_urls = {
-    'Tfidf.pkl': 'https://example.com/path-to-tfidf.pkl',
+    'tfidf.pkl': 'https://example.com/path-to-tfidf.pkl',
     'model.pkl': 'https://example.com/path-to-model.pkl'
 }
 
