@@ -37,7 +37,7 @@ for file in model_files:
 
 # Load the saved models (TF-IDF Vectorizer and Logistic Regression Model)
 try:
-    with open(os.path.join(BASE_DIR, 'Tfidf.pkl'), 'rb') as f:
+    with open(os.path.join(BASE_DIR, 'tfidf.pkl'), 'rb') as f:
         tfidf_vectorizer = pickle.load(f)
 
     with open(os.path.join(BASE_DIR, 'model.pkl'), 'rb') as f:
