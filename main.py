@@ -10,11 +10,15 @@ import os
 app = FastAPI()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Load the saved models (TF-IDF Vectorizer and Logistic Regression Model)
-with open(os.path.join(BASE_DIR, 'Tfidf.pkl'), 'rb') as f:
-    tfidf_vectorizer = pickle.load(f)
+tfidf_path = os.path.join(BASE_DIR, 'Tfidf.pkl')
+model_path = os.path.join(BASE_DIR, 'model.pkl')
 
-with open(os.path.join(BASE_DIR, 'model.pkl'), 'rb') as f:
+if not os.path.exists(tfidf_path) or not os.path.exists(model_path):
+    raise FileNotFoundError("Model files are missing in the deployment environment.")
+
+with open(tfidf_path, 'rb') as f:
+    tfidf_vectorizer = pickle.load(f)
+with open(model_path, 'rb') as f:
     prediction_model = pickle.load(f)
 
 # Define the input data structure
