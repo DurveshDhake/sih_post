@@ -1,3 +1,4 @@
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import pickle
@@ -10,6 +11,20 @@ import requests
 
 # Initialize FastAPI app
 app = FastAPI()
+# List of origins that are allowed to make requests
+origins = [
+    "http://localhost:4200",  # Allow requests from Angular frontend
+    # You can add more allowed origins if needed
+]
+
+# Add CORSMiddleware to handle cross-origin requests
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Specify the allowed origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Check and download model files if missing
